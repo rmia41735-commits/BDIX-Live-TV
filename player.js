@@ -348,6 +348,10 @@ async function createPlayer() {
     try { await player.destroy(); } catch (_) {}
     player = null;
   }
+  if (!window.shaka?.Player) {
+    console.error("[Player Diagnostic] SHAKA_NOT_LOADED");
+    throw new Error("Player library not loaded. Check Shaka Player script.");
+  }
   shaka.polyfill.installAll();
   if (!shaka.Player.isBrowserSupported()) throw new Error("Browser not supported");
   player = new shaka.Player();
@@ -451,6 +455,33 @@ async function loadServer(index) {
   if (pipe.headers.referrer && !server.referrer) server.referrer = pipe.headers.referrer;
   if (pipe.headers.origin && !server.origin) server.origin = pipe.headers.origin;
   if (server.cookie) server.cookie = normalizeCookie(server.cookie);
+
+  // Diagnose failures before requesting a manifest. Do not log full URLs,
+  // since query strings can contain access tokens.
+  let urlProtocol = "";
+  try {
+    urlProtocol = new URL(server.url).protocol;
+  } catch (_) {
+    urlProtocol = "invalid";
+  }
+  console.info("[Player Diagnostic] SOURCE_SELECTED", {
+    channelId: String(channel.id ?? ""),
+    serverIndex,
+    streamType: getStreamType(server.url),
+    protocol: urlProtocol,
+  });
+  if (!["http:", "https:"].includes(urlProtocol)) {
+    console.error("[Player Diagnostic] INVALID_STREAM_URL");
+    markServerDead(serverIndex);
+    await tryFallback(new Error("Invalid stream URL"));
+    return;
+  }
+  if (location.protocol === "https:" && urlProtocol === "http:") {
+    console.error("[Player Diagnostic] MIXED_CONTENT_BLOCKED");
+    markServerDead(serverIndex);
+    await tryFallback(new Error("HTTP stream blocked on HTTPS site. Use an authorized HTTPS source."));
+    return;
+  }
 
   // VOD (single video file, not an adaptive manifest) — play natively,
   // Shaka never gets involved. These can't carry Cookie/Origin/Referer
