@@ -1,0 +1,1 @@
+const a=require('../../_oauth');module.exports=async(req,res)=>{if(req.method!=='POST')return a.respond(res,405,{error:'Method not allowed'});if(!a.sameHost(req))return a.respond(res,400,{error:'Unexpected host'});res.setHeader('Set-Cookie',a.secureCookie('bdix_yt_session','',0));return a.respond(res,200,{connected:false})};
