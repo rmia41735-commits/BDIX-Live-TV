@@ -14,5 +14,8 @@ https://liljnnprtqwoimmsjuhy.supabase.co/storage/v1/object/public/IPTV-Network/S
 https://liljnnprtqwoimmsjuhy.supabase.co/storage/v1/object/public/IPTV-Network/IPTV-NETWORK/15-11-26_A.m3u
 https://liljnnprtqwoimmsjuhy.supabase.co/storage/v1/object/public/IPTV-Network/IPTV-NETWORK/23-11-26-Link-2_C.m3u
 
+## Skym3u.dev
+https://liljnnprtqwoimmsjuhy.supabase.co/storage/v1/object/public/IPTV-Network/Skym3u.dev/24-11-26-Link-1_A.m3u
+
 ## Import
 Open the BDIX Play TV Admin Panel > Import channel playlist and paste one URL at a time. This manifest does not automatically change the production channel catalog.
